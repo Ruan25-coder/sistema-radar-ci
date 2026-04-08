@@ -1,0 +1,37 @@
+name: CI Java Radar
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v3
+
+      - name: Configurar Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Compilar projeto
+        run: mvn clean compile
+
+      - name: Executar testes
+        run: mvn test
+
+      - name: Gerar relatório JUnit
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: relatorio-testes
+          path: target/surefire-reports/
+
+      - name: Deploy (simulado)
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deploy realizado com sucesso!"
